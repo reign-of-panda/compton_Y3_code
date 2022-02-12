@@ -552,6 +552,8 @@ plt.show()
 
 chi_sq, p_val = chisquare(true_E_comp, compton_curve(angles, *par2))
 
+#%%
+
 
 
 
