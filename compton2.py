@@ -76,7 +76,8 @@ def fit_gauss(x_lims, E_arr, count_arr, count_err):
     # Calculate least squares
     lsq_arr = least_squares(E_arr, count_arr, par, gauss)
     
-    b_err *= np.std(np.sqrt(lsq_arr)) 
+    b_err *= np.std(np.sqrt(lsq_arr))
+    #b_err = par[2] / np.sqrt(np.sum(abs(count_arr)))
     
     # Peak energy
     central_energy = -par[1]
@@ -216,15 +217,19 @@ dF_tot_noTar = dF_tot_noTar[all_heads] # This reorders the columns by heading
 
 # Differential 
 dF_diff = dF_tot - dF_tot_noTar
-dF_diff[0] = dF_tot[0] 
-dF_diff[2] = dF_tot[2] 
-dF_diff[3] = dF_tot[3]
+# =============================================================================
+# dF_diff[0] = dF_tot[0] 
+# dF_diff[2] = dF_tot[2] 
+# dF_diff[3] = dF_tot[3]
+# =============================================================================
 
 dF_diff_err = np.sqrt(dF_tot + dF_tot_noTar) # + dF_tot_noTar
-dF_diff_err[0] = np.sqrt(dF_tot[0])
-dF_diff_err[2] = np.sqrt(dF_tot[2])
-dF_diff_err[3] = np.sqrt(dF_tot[3])
-
+# =============================================================================
+# dF_diff_err[0] = np.sqrt(dF_tot[0])
+# dF_diff_err[2] = np.sqrt(dF_tot[2])
+# dF_diff_err[3] = np.sqrt(dF_tot[3])
+# 
+# =============================================================================
 x = x1
 
 #%%
@@ -252,7 +257,7 @@ x = x1
 limit_dict = dict([
             (0, [160, 250]),
             (2, [180, 240]),
-            (3, [175, 240]),
+            (3, [175, 225]),
             (4, [135, 240]),
             (5, [120, 220]),
             (6, [120, 220]),
@@ -336,11 +341,20 @@ plt.show()
 """
 Chi squared 
 """
+
+import scipy.stats as std
+
+
 x_arr = np.linspace(angles[0], angles[-1], 16)
-y_arr = compton_curve(x_arr, *par2)
+y_arr = compton_curve(angles, *par2)
 
 chi_sq, p_val = chisquare(true_E_comp, y_arr)
 
+chisq = np.sum((y_arr[:]-true_E_comp[:])**2/(true_E_err[:]**2))
+
+prob = std.chi2.sf(chisq,len(true_E_comp[:])-1)
+
+print(prob)
 print(chi_sq, p_val)
 
 #%%
