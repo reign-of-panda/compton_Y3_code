@@ -77,7 +77,7 @@ def fit_gauss(x_lims, E_arr, count_arr, count_err):
     lsq_arr = least_squares(E_arr, count_arr, par, gauss)
     
     b_err *= np.std(np.sqrt(lsq_arr))
-    #b_err = par[2] / np.sqrt(np.sum(abs(count_arr)))
+    b_err = par[2] / np.sqrt(np.sum(abs(count_arr)))
     
     # Peak energy
     central_energy = -par[1]
@@ -173,7 +173,7 @@ Perform all the data unpacking here
 """
 # Headers to use 
 even_head = [0, 2, 4, 6, 8, 10, 12, 14, 16]
-odd_head = [3, 5, 7, 9, 11, 13, 15]
+odd_head = [3, 5, 7, 9, 11, 13, 15,3.5]
 all_heads = np.sort(even_head + odd_head)
 
 # This is the no target data (even anglular intervals)
@@ -195,18 +195,29 @@ for i in this_sucks:
     elif np.shape(dF)[1] == 1:
         source_data = dF[0]
     all_dF.append(source_data)
+    
+#%%
 
 dF_even = pd.concat(all_dF, axis = 1, ignore_index=True)
 dF_even.columns = even_head
 
 # Data with no target (odd angular intervals)
-this_sucks2 = ['3x', '5x', '7x', '9x', '11x', '13x', '15x']
+this_sucks2 = ['3x', '5x', '7x', '9x', '11x', '13x', '15x', '3.5x']
+x_35, dF_35 = txt_unpack("Day11_Cs137_3.5xdeg_and_noTar.txt")
+dF_35_Tar = dF_35[0]
+dF_35_noTar = dF_35[1]
 x_odd, dF_noTar_odd = txt_unpack("Day6_Cs137_3x_15xdeg_noTarget.txt")
+
+dF_noTar_odd = pd.concat([dF_noTar_odd,dF_35_noTar], axis = 1)
 dF_noTar_odd.columns = odd_head
+
 
 # Data with target (odd anglular intervals)
 x_odd, dF_odd = txt_unpack("Day6_Cs137_3x_15xdeg.txt")
+dF_odd = pd.concat([dF_odd,dF_35_Tar], axis = 1)
 dF_odd.columns = odd_head
+
+
 
 # Now combine the odd and even data
 dF_tot = pd.concat([dF_even, dF_odd], axis = 1)
@@ -271,6 +282,7 @@ limit_dict = dict([
             (14, [70, 140]),
             (15, [60, 120]),
             (16, [60, 120]),
+            (3.5, [150,230])
             ])
 ind = 3
 
